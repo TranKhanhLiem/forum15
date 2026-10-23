@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>De 15 Forum</title>
+</head>
+<body>
+    <h1>Dien dan / Cong dong</h1>
+    <form id="postForm">
+        <input type="text" id="author_name" placeholder="Ten hien thi" required><br>
+        <input type="text" id="title" placeholder="Tieu de" required><br>
+        <textarea id="body" placeholder="Noi dung" required></textarea><br>
+        <button type="submit">Dang bai</button>
+    </form>
+    <h2>Bai viet moi</h2>
+    <div id="postsList"></div>
+    <script>
+        async function loadPosts() {
+            const res = await fetch('/api/posts');
+            const posts = await res.json();
+            document.getElementById('postsList').innerHTML = posts.map(p => `
+                <div><h3>${p.title}</h3><p>${p.body}</p><small>${p.author_name} - ${p.created_at}</small></div><hr>
+            `).join('');
+        }
+        document.getElementById('postForm').onsubmit = async (e) => {
+            e.preventDefault();
+            await fetch('/api/posts', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    author_name: document.getElementById('author_name').value,
+                    title: document.getElementById('title').value,
+                    body: document.getElementById('body').value
+                })
+            });
+            loadPosts();
+        };
+        loadPosts();
+    </script>
+</body>
+</html>
