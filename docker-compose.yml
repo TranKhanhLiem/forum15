@@ -78,5 +78,27 @@ services:
     depends_on:
       - prometheus
 
+  loki:
+    image: grafana/loki:2.9.4
+    container_name: forum15-loki
+    restart: always
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/loki-config.yaml
+    volumes:
+      - ./loki/loki-config.yaml:/etc/loki/loki-config.yaml
+
+  promtail:
+    image: grafana/promtail:2.9.4
+    container_name: forum15-promtail
+    restart: always
+    volumes:
+      - ./promtail/promtail-config.yaml:/etc/promtail/promtail-config.yaml
+      - /var/log:/var/log
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: -config.file=/etc/promtail/promtail-config.yaml
+    depends_on:
+      - loki
+
 volumes:
   db_data:
